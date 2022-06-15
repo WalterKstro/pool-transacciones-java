@@ -1,31 +1,46 @@
 package main;
 
 
+import interfaces.CategoryImplement;
 import model.Category;
 import model.Product;
 import connection.ConnectionDatabase;
-import interfaces.CrudImplements;
+import interfaces.ProductImplement;
 import interfaces.InterfaceCrud;
 
 import java.sql.SQLException;
 
 public class Main {
     public static void main(String[] args) throws SQLException {
-        try ( var connection = ConnectionDatabase.createConnection();){
+        try ( var connection = ConnectionDatabase.getConnect();){
             if( connection.getAutoCommit() ) {
                 connection.setAutoCommit(false);
             }
 
             try {
-                InterfaceCrud crud = new CrudImplements();
-                // UPDATE
-                crud.create(new Product(5,"Mouse Ryzer",650.60f,"E-056",new Category(1)));
+                InterfaceCrud product = new ProductImplement( connection );
+                InterfaceCrud category = new CategoryImplement( connection );
+
                 // CREATE
-                crud.create(new Product("Silla Gamer XRider",2700.60f,"TI-16",new Category(3)));
+                //var cat = (Category) category.create(new Category("Higiene"));
                 // DELETE
-                crud.delete( new Product(7) );
-                // READ
-                crud.read();
+                //category.delete(new Category(3));
+                // FIND
+                //System.out.println(category.find(new Category(5)));
+
+                // UPDATE
+                //product.create(new Product(5,"Crema Nivea",12.60f,"B-066",new Category(7)));
+                // CREATE
+                product.create(new Product("Smartphone POCO",2700.60f,"TI-16",new Category(1)));
+                // DELETE
+                //product.delete( new Product(7) );
+                // FIND
+                //System.out.println(product.find(new Product(6)));
+
+
+                // READ CATEGORIES AND PRODUCTS
+                product.read();
+                category.read();
 
                 connection.commit();
             }catch (SQLException ex){

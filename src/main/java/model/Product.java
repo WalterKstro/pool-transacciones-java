@@ -51,6 +51,10 @@ public class Product {
         return sku;
     }
 
+    public void setSku(String sku) {
+        this.sku = sku;
+    }
+
     public Category getCategory() {
         return category;
     }
@@ -66,7 +70,7 @@ public class Product {
         sb.append(", name='").append(name).append('\'');
         sb.append(", price=").append(price);
         sb.append(", sku='").append(sku).append('\'');
-        sb.append(", category=").append(category.getCategory());
+        sb.append(", category=").append(category.getName());
         sb.append('}');
         return sb.toString();
     }

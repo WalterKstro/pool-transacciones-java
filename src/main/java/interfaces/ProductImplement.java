@@ -2,30 +2,29 @@ package interfaces;
 
 import model.Category;
 import model.Product;
-import connection.ConnectionDatabase;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CrudImplements implements InterfaceCrud<Product>{
+public class ProductImplement implements InterfaceCrud<Product>{
     private List<Product> listProducts;
+    private Connection connection;
 
-    public CrudImplements() {
+
+    public ProductImplement(Connection connection) {
         listProducts = new ArrayList<>();
+        this.connection = connection;
     }
 
-    private Connection getConnection () throws SQLException {
-        return ConnectionDatabase.createConnection();
-    }
     @Override
     public void read() throws SQLException {
         var query = "SELECT id_prod, name_prod,price_prod,sku_prod, id_cat, name_cat " +
                 "    FROM products AS P LEFT JOIN categories AS C ON P.cat_id = C.id_cat";
         try (
-                var statement = getConnection().prepareStatement(query);
-                var results = statement.executeQuery();
+                var statement = connection.createStatement();
+                var results = statement.executeQuery(query);
                 ){
             while ( results.next() ) {
                     listProducts.add(
@@ -43,13 +42,13 @@ public class CrudImplements implements InterfaceCrud<Product>{
     }
 
         @Override
-    public void create(Product p) throws SQLException {
+    public Product create(Product p) throws SQLException {
         var query = "UPDATE  products SET name_prod = ?, price_prod = ?, sku_prod=?, cat_id = ? WHERE id_prod = ?";
         if( p.getId() == null ){
             query = "INSERT INTO products (name_prod,price_prod,sku_prod,cat_id) VALUES (?,?,?,?)";
         }
         try(
-                var statement = getConnection().prepareStatement( query );
+                var statement = connection.prepareStatement( query );
                 ) {
 
             statement.setString(1, p.getName() );
@@ -64,12 +63,13 @@ public class CrudImplements implements InterfaceCrud<Product>{
             statement.executeUpdate();
 
         }
+        return p;
     }
     @Override
     public void delete(Product p) throws SQLException {
         var query = "DELETE FROM products WHERE id_prod = ?";
         try (
-                var statement = getConnection().prepareStatement(query)
+                var statement = connection.prepareStatement(query)
         )
         {
             statement.setInt(1,p.getId());
@@ -77,10 +77,26 @@ public class CrudImplements implements InterfaceCrud<Product>{
         }
     }
     @Override
-    public Product find(Product p) {
+    public Product find(Product p) throws SQLException {
         var query = "SELECT id_prod, name_prod,price_prod,sku_prod, id_cat, name_cat  " +
                 "FROM products AS P JOIN categories as C ON P.cat_id = C.id_cat " +
                 "WHERE id_prod = ?";
+        try (
+                var statement = connection.prepareStatement(query);
+                ){
+
+            statement.setInt(1, p.getId());
+            var results = statement.executeQuery();
+            results.next();
+            p.setName( results.getString(2) );
+            p.setPrice( results.getFloat(3) );
+            p.setSku( results.getString(4) );
+            p.setCategory( new Category(
+                    results.getInt(5),
+                    results.getString(6) )
+            );
+
+        }
         return p;
     }
 }
