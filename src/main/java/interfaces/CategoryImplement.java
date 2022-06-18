@@ -12,11 +12,12 @@ public class CategoryImplement implements InterfaceCrud<Category>{
     private Connection connection;
     private List<Category> list;
 
-    public CategoryImplement(Connection connection) {
-        this.connection = connection;
+    public CategoryImplement() {
         this.list = new ArrayList<>();
     }
-
+    public void setConnection(Connection connection) {
+        this.connection = connection;
+    }
     @Override
     public void read() throws SQLException {
         try (

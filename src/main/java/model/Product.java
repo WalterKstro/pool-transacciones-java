@@ -23,6 +23,12 @@ public class Product {
         this.category = category;
     }
 
+    public Product(String name, float price, String sku) {
+        this.name = name;
+        this.price = price;
+        this.sku = sku;
+    }
+
     public Product(Integer id) {
         this.id = id;
     }

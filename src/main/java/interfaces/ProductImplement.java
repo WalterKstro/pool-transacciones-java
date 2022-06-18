@@ -13,8 +13,11 @@ public class ProductImplement implements InterfaceCrud<Product>{
     private Connection connection;
 
 
-    public ProductImplement(Connection connection) {
+    public ProductImplement() {
         listProducts = new ArrayList<>();
+    }
+
+    public void setConnection(Connection connection) {
         this.connection = connection;
     }
 
